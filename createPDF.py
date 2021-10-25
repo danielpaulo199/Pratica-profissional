@@ -146,10 +146,58 @@ class createPDF:
 
     def drawPrices(self, pdf):
         pdfmetrics.registerFont(TTFont('Calibri', 'calibrib.ttf'))
-        pdf.setFont("Calibri", 30)
         pdf.setFillColorRGB(0.91796875, 0.421875, 0.08203125)  # Laranja
+        pdf.setFont("Calibri", 20)
+        # Variaveis para tamanhos
+        dolarSignFont = 20
+        numeralFont = 114
+        decimalFont = 50
 
-        pdf.drawString(300, 300, 'Hello world 3,99')
+        productAmmount = str(len(self.products))
+
+        priceCoordinates = {
+            "1": {
+                "x": [385],
+                "y": [120],
+                "anchor": 400
+            },
+            "2": {
+                "x": [50, 300],
+                "y": [380, 125]
+            },
+            "3": {
+                "x": [50, 35, 315],
+                "y": [380, 160, 160]
+            },
+            "4": {
+                "x": [35, 315, 35, 315],
+                "y": [415, 415, 160, 160]
+            }
+        }
+
+        for index in range(0, len(self.products)):
+            x = priceCoordinates[productAmmount]['anchor']
+
+            # Desenha o R$
+            pdf.setFontSize(dolarSignFont)
+            pdf.drawString(
+                priceCoordinates[productAmmount]['x'][index], priceCoordinates[productAmmount]['y'][index], "R$")
+            # Desenha o decimal com base na ancora
+            pdf.setFontSize(numeralFont)
+            pdf.drawString(
+                priceCoordinates[productAmmount]['anchor'], priceCoordinates[productAmmount]['y'][index], "10")
+            pdf.setFontSize(decimalFont)
+            pdf.drawString(
+                x + 30, priceCoordinates[productAmmount]['y'][index], ",10")
+
+            # textWidth = stringWidth(line2, 'Helvetica', 8) - Método pra calcular o tamanho da string
+
+            # pdf.drawImage(self.products[index]['img_path'],
+            #              imgCoordinates[productAmmount]['x'][index],
+            #              imgCoordinates[productAmmount]['y'][index],
+            #              width=imgCoordinates.get(
+            #                  productAmmount, {}).get('width', 238),
+            #              height=imgCoordinates.get(productAmmount, {}).get('height', 167))
 
     def printar(self):
         print(self.savepath)
