@@ -3,7 +3,6 @@ from datetime import datetime
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
-from reportlab.lib import colors
 
 
 class createPDF:
@@ -33,7 +32,8 @@ class createPDF:
         self.drawPrices(pdf)
         pdf.save()
 
-        pdfmetrics.registerFont(TTFont('Calibri', 'calibrib.ttf'))
+        # Abre o arquivo automaticamente após criado
+        os.startfile(self.savepath + '\\' + PDFname)
 
     def checkAndCreatesavepath(self):
         if not os.path.isdir(self.savepath):
@@ -148,26 +148,23 @@ class createPDF:
         pdfmetrics.registerFont(TTFont('Calibri', 'calibrib.ttf'))
         pdf.setFillColorRGB(0.91796875, 0.421875, 0.08203125)  # Laranja
         pdf.setFont("Calibri", 20)
-        # Variaveis para tamanhos
-        dolarSignFont = 20
-        numeralFont = 114
-        decimalFont = 50
 
+        # Total de produtos em string para chamar as chaves do dicionario
         productAmmount = str(len(self.products))
 
+        # coordenadas base
         priceCoordinates = {
             "1": {
-                "x": [385],
-                "y": [120],
-                "anchor": 400
+                "x": [300],
+                "y": [120]
             },
             "2": {
-                "x": [50, 300],
-                "y": [380, 125]
+                "x": [300, 40],
+                "y": [360, 100]
             },
             "3": {
-                "x": [50, 35, 315],
-                "y": [380, 160, 160]
+                "x": [300, 118, 393],
+                "y": [360, 100, 100]
             },
             "4": {
                 "x": [35, 315, 35, 315],
@@ -175,29 +172,84 @@ class createPDF:
             }
         }
 
+        # String fixa para desenha o R$
+        dolarSignString = 'R$'
+        dolarSignFont = 20
+
         for index in range(0, len(self.products)):
-            x = priceCoordinates[productAmmount]['anchor']
+
+            # define as strings a serem desenhadas
+            numeralString = self.prices[index].split(',')[0]
+            decimalString = "," + self.prices[index].split(',')[1]
+
+            # Define o tanho da fonte para as string
+            numeralFont, decimalFont = self.getPriceFontSize(
+                numeralString, index)
+
+            # Define as coordenadas base
+            x = priceCoordinates[productAmmount]['x'][index]
+            y = priceCoordinates[productAmmount]['y'][index]
+
+            # Desenha os decimais
+            pdf.setFontSize(decimalFont)
+            pdf.drawString(x, y, decimalString)
+
+            # Calcula a proxima coordenada com base no tamanho da passada
+            nextCoordinate = x - pdfmetrics.stringWidth(
+                decimalString, 'Calibri', decimalFont)
+
+            # Desenha o Numeral
+            pdf.setFontSize(numeralFont)
+            pdf.drawString(nextCoordinate, y, numeralString)
+
+            # Calcula a proxima coordenada com base no tamanho da passada
+            nextCoordinate -= pdfmetrics.stringWidth(
+                numeralString, 'Calibri', numeralFont)
 
             # Desenha o R$
             pdf.setFontSize(dolarSignFont)
-            pdf.drawString(
-                priceCoordinates[productAmmount]['x'][index], priceCoordinates[productAmmount]['y'][index], "R$")
-            # Desenha o decimal com base na ancora
-            pdf.setFontSize(numeralFont)
-            pdf.drawString(
-                priceCoordinates[productAmmount]['anchor'], priceCoordinates[productAmmount]['y'][index], "10")
-            pdf.setFontSize(decimalFont)
-            pdf.drawString(
-                x + 30, priceCoordinates[productAmmount]['y'][index], ",10")
+            pdf.drawString(nextCoordinate, y, dolarSignString)
 
-            # textWidth = stringWidth(line2, 'Helvetica', 8) - Método pra calcular o tamanho da string
+    def getPriceFontSize(self, numeralString, index):
+        if len(self.products) == 1:
+            numeralFont = 114
+            decimalFont = 50
 
-            # pdf.drawImage(self.products[index]['img_path'],
-            #              imgCoordinates[productAmmount]['x'][index],
-            #              imgCoordinates[productAmmount]['y'][index],
-            #              width=imgCoordinates.get(
-            #                  productAmmount, {}).get('width', 238),
-            #              height=imgCoordinates.get(productAmmount, {}).get('height', 167))
+        if len(self.products) == 2:
+            numeralFont = 114
+            decimalFont = 50
+
+            if len(numeralString) > 2:
+                numeralFont = 90
+                decimalFont = 45
+
+        # Caso até 3 produtos
+        if len(self.products) == 3:
+            if index == 0:
+                numeralFont = 114
+                decimalFont = 50
+
+                if len(numeralString) > 2:
+                    numeralFont = 90
+                    decimalFont = 45
+            else:
+                numeralFont = 60
+                decimalFont = 30
+
+                if len(numeralString) >= 2:
+                    numeralFont = 45
+                    decimalFont = 25
+
+        # Caso 4 produtos
+        if len(self.products) == 4:
+            numeralFont = 60
+            decimalFont = 30
+
+            if len(numeralString) >= 2:
+                numeralFont = 45
+                decimalFont = 25
+
+        return numeralFont, decimalFont
 
     def printar(self):
         print(self.savepath)
