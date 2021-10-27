@@ -262,8 +262,3 @@ class createPDF:
         pdf.setFillColorRGB(1, 1, 1)
         pdf.setFontSize(24)
         pdf.drawString(120, 630, expDate)
-
-    def printar(self):
-        print(self.savepath)
-        print(self.products)
-        print(self.prices)

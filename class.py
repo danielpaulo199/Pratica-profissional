@@ -2,10 +2,12 @@ from os import system, path, listdir
 import re
 import pickle
 from createPDF import createPDF
+import tkinter as tk
+from tkinter import filedialog
+from shutil import copyfile
 
 # adicionar fundos
 # Bug = na hora de selecionar produtos no autocomplete se colocar letra crasha
-# selecionar BG caso não encontre?
 
 
 class NiceDoDia:
@@ -32,8 +34,6 @@ class NiceDoDia:
 
             1.Gerar Oferta
             2.Alterar imagem de fundo
-            3.Testefile
-            4.sair
             3.Adicionar novas imagens de fundo
             4.Adicionar produtos
             5.Editar produto
@@ -47,8 +47,12 @@ class NiceDoDia:
                 system('cls')
                 self.setBgImage()
             elif ans == "3":
-                self.payloadPDF()
+                system('cls')
+                self.addBackgrouds()
             elif ans == "4":
+                system('cls')
+                self.payloadPDF()
+            elif ans == "6":
                 exit()
             elif ans != "":
                 wait = input('\n Opção Invalida, tente novamente')
@@ -226,6 +230,40 @@ class NiceDoDia:
             "PDFsavepath": self.PDFsavepath}
 
         system("pause")
+
+    def addBackgrouds(self):
+        root = tk.Tk()
+        root.withdraw()
+
+        print("Selecione uma imagem...")
+        selectedFile = filedialog.askopenfilename(
+            initialdir="/", title="Selecione uma imagem", filetypes=(("jpeg files", "*.jpg"), ("png files", "*.png")))
+
+        if selectedFile == "":
+            print("\nNenhuma imagem selecionada!")
+            system("pause")
+            return
+
+        # Pega a extensão do arquivo para salvar dnv
+        extension = selectedFile[-4:]
+
+        # input que define o novo nome do fundo
+        while 1:
+            name = input("Digite o nome da imagem de fundo: ").strip()
+            if len(name) >= 1 and re.match(r'^[A-Za-z0-9_-]*$', name):
+                break
+            print('Nome do arquivo não pode conter: ',
+                  re.findall(r'[^A-Za-z0-9_-]', name))
+            print('\nTente novamente: ')
+
+        # Copia a imagem selecionada para a pasta de fundos
+        savepath = self.BGsavepath+'/'+name+extension
+        copyfile(selectedFile, savepath)
+
+        # ADD= colocar o novo bg no arquivo local com # no prefixo
+
+        # para a liste
+        # newBackground = "#"+name
 
 
 if __name__ == "__main__":
