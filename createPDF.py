@@ -1,5 +1,6 @@
 import os
-from datetime import datetime
+from datetime import date, datetime
+from platform import system
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
@@ -13,8 +14,6 @@ class createPDF:
         self.products = newOffer['products']
         self.prices = newOffer['prices']
         self.background = newOffer['background']
-        self.validity = newOffer.get(
-            'validity', datetime.today().strftime('%d/%m/%Y'))
 
     def initPDFfile(self):
         # Cria o diretorio para salvar o PDF e cria o nome do arquivo
@@ -27,9 +26,10 @@ class createPDF:
 
         # Desenhas os objetos no PDF
         self.drawProductsImages(pdf)
-       # AINDA EM DEV --  self.drawCenterLines(pdf)
+        self.drawCenterLines(pdf)
         self.drawDescriptions(pdf)
         self.drawPrices(pdf)
+        self.drawExpirationDate(pdf)
         pdf.save()
 
         # Abre o arquivo automaticamente após criado
@@ -90,12 +90,18 @@ class createPDF:
                           height=imgCoordinates.get(productAmmount, {}).get('height', 167))
 
     def drawCenterLines(self, pdf):
-        pass
-        # SERA DESENVOLVIDO DEPOIS DAS DESCRIÇÕES E PREÇOS att.
-        # canvas.line(x1,y1,x2,y2)
-        # pdf.line(0,510,500,510)
+       # Desenha as linhas para separar os produtos
         pdf.setStrokeColorRGB(0.91796875, 0.421875, 0.08203125)  # laranja
-        pdf.line(24, 350, 571, 350)
+
+        if len(self.products) == 2:
+            pdf.line(24, 325, 571, 325)
+
+        if len(self.products) > 2:
+            pdf.line(24, 333, 571, 333)
+            pdf.line(290, 65, 290, 333)
+
+            if len(self.products) == 4:
+                pdf.line(290, 340, 290, 591)
 
     def drawDescriptions(self, pdf):
         pdfmetrics.registerFont(TTFont('Algebrian Regular', 'ALGER.ttf'))
@@ -152,23 +158,23 @@ class createPDF:
         # Total de produtos em string para chamar as chaves do dicionario
         productAmmount = str(len(self.products))
 
-        # coordenadas base
+        # coordenadas base onde iniciara os decimais
         priceCoordinates = {
             "1": {
-                "x": [300],
+                "x": [470],
                 "y": [120]
             },
             "2": {
-                "x": [300, 40],
+                "x": [470, 210],
                 "y": [360, 100]
             },
             "3": {
-                "x": [300, 118, 393],
-                "y": [360, 100, 100]
+                "x": [470, 250, 530],
+                "y": [360, 75, 75]
             },
             "4": {
-                "x": [35, 315, 35, 315],
-                "y": [415, 415, 160, 160]
+                "x": [255, 530, 250, 530],
+                "y": [340, 340, 75, 75]
             }
         }
 
@@ -195,8 +201,8 @@ class createPDF:
             pdf.drawString(x, y, decimalString)
 
             # Calcula a proxima coordenada com base no tamanho da passada
-            nextCoordinate = x - pdfmetrics.stringWidth(
-                decimalString, 'Calibri', decimalFont)
+            nextCoordinate = x - int(pdfmetrics.stringWidth(
+                numeralString, 'Calibri', numeralFont))
 
             # Desenha o Numeral
             pdf.setFontSize(numeralFont)
@@ -204,7 +210,7 @@ class createPDF:
 
             # Calcula a proxima coordenada com base no tamanho da passada
             nextCoordinate -= pdfmetrics.stringWidth(
-                numeralString, 'Calibri', numeralFont)
+                dolarSignString, 'Calibri', dolarSignFont)
 
             # Desenha o R$
             pdf.setFontSize(dolarSignFont)
@@ -250,6 +256,12 @@ class createPDF:
                 decimalFont = 25
 
         return numeralFont, decimalFont
+
+    def drawExpirationDate(self, pdf):
+        expDate = str(date.today().strftime("%d/%m/%Y"))
+        pdf.setFillColorRGB(1, 1, 1)
+        pdf.setFontSize(24)
+        pdf.drawString(120, 630, expDate)
 
     def printar(self):
         print(self.savepath)

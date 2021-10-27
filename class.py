@@ -3,9 +3,7 @@ import re
 import pickle
 from createPDF import createPDF
 
-# importar as cores depois
 # adicionar fundos
-# R$ ser desenhado por uma conta que adiciona mais por length do preço
 # Bug = na hora de selecionar produtos no autocomplete se colocar letra crasha
 # selecionar BG caso não encontre?
 
@@ -16,13 +14,13 @@ class NiceDoDia:
         self.productAmmount = 0
         self.PDFsavepath = path.join('./PDFs/')
         self.BGsavepath = './fundos'
+        self.background = self.BGsavepath+'/Default.jpg'
         # Dict que vai conter as variaveis para gerar o pdf
         self.newOfferDict = {
             "products": [],
             "prices": [],
-            "PDFsavepath": self.PDFsavepath
-            # background
-
+            "PDFsavepath": self.PDFsavepath,
+            "background": self.background
         }
 
     def mainMenu(self):
@@ -34,6 +32,8 @@ class NiceDoDia:
 
             1.Gerar Oferta
             2.Alterar imagem de fundo
+            3.Testefile
+            4.sair
             3.Adicionar novas imagens de fundo
             4.Adicionar produtos
             5.Editar produto
@@ -45,8 +45,10 @@ class NiceDoDia:
                 self.createOffer()
             elif ans == "2":
                 system('cls')
-                self.testefile()
+                self.setBgImage()
             elif ans == "3":
+                self.payloadPDF()
+            elif ans == "4":
                 exit()
             elif ans != "":
                 wait = input('\n Opção Invalida, tente novamente')
@@ -115,7 +117,7 @@ class NiceDoDia:
 
         matches = ["Cancelar"]
         for find in data:
-            if product in find:
+            if product in find and find[0] != "#":
                 matches.append(find)
 
         if len(matches) <= 1:
@@ -139,27 +141,73 @@ class NiceDoDia:
 
             print("Opção invalida")
 
-    def setBGimage(self):
-        default = str(self.BGsavepath+'/Default.jpg')
+    def setDefaultBGimage(self):
+
+        if path.exists(self.newOfferDict['background']):
+            return
+
+        default = self.BGsavepath+'/Default.jpg'
         # Seta o background para padrão
         if path.exists(default):
             self.newOfferDict['background'] = default
         else:  # caso não encontre o default
             backgrounds = listdir(self.BGsavepath)
             # usa o primeiro que encontar no diretorio
-            self.newOfferDict['background'] = str(
-                self.BGsavepath+'/'+backgrounds[0])
+            self.newOfferDict['background'] = self.BGsavepath + \
+                '/'+backgrounds[0]
+
+    def setBgImage(self):
+        with open(self.itensFile, "rb") as f:
+            data = pickle.load(f)
+            f.close()
+
+        # hashtag é o sufixo dos backgrounds , ja q o input de produto não aceita # ele so sera mostrado aqui
+        backgrounds = "#"
+
+        matches = [".Cancelar"]
+        for find in data:
+            if backgrounds in find:
+                matches.append(find)
+
+        if len(matches) <= 1:
+            print("\n Não ha imagens de fundo cadastradas!")
+            system("pause")
+            return
+
+        print("Selecione a imagem de fundo: \n")
+        for index, name in enumerate(matches):
+            print("{0}: {1}".format(index, name[1:]))
+        print("\n0: Cancelar\n")
+
+        while 1:
+            option = int(input("Digite a opção: "))
+
+            if option >= 1 and option < len(matches):
+                selectedBg = matches[option]
+                self.newOfferDict['background'] = data[selectedBg]['img_path']
+                break
+
+            if option == 0:
+                return
+
+            print("Opção invalida!")
+
+        print("\n Imagem de fundo definida com sucesso! \n")
+        system('pause')
 
     def createOffer(self):
+        # Chama os métodos para receber os inputs
         self.getProductAmmountInput()
         self.getProductsInput()
-        self.setBGimage()
+        # Define o background
+        self.setDefaultBGimage()
+        # Método para instanciar e criar novo PDF
         self.createPDFfile()
 
-    def testefile(self):
+    def payloadPDF(self):
 
         self.newOfferDict = {'products': [{'name': 'abacaxi tropical unidade', 'img_path': './imgs/abacaxi tropical und.jpg', 'disc1': 'abacaxi tropical',
-                                           'disc2': 'gostozo d+', 'disc3': 'und'}], 'prices': ['1,00'], 'PDFsavepath': './PDFs/', 'background': './fundos/Default.jpg'}
+                                           'disc2': 'gostozo d+', 'disc3': 'und'}], 'prices': ['222,00'], 'PDFsavepath': './PDFs/', 'background': './fundos/Default.jpg'}
 
         PDFfile = createPDF(self.newOfferDict)
         PDFfile.initPDFfile()
@@ -168,6 +216,15 @@ class NiceDoDia:
 
         PDFfile = createPDF(self.newOfferDict)
         PDFfile.initPDFfile()
+
+        # Deleta a instacia da classe de geração de PDF
+        del PDFfile
+        # Zera os valores da oferta
+        self.newOfferDict = {
+            "products": [],
+            "prices": [],
+            "PDFsavepath": self.PDFsavepath}
+
         system("pause")
 
 

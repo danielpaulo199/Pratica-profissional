@@ -52,21 +52,35 @@ def addToPkl():
         pickle.dump(obj, f)
 
 
+def addBG():
+    with open("data.pkl", "rb") as f:
+        obj = pickle.load(f)
+
+    obj["#Red Background"] = {
+        "name": "Red Background",
+        "img_path": "./fundos/Red Background.jpg"
+    }
+
+    with open("data.pkl", "wb") as f:
+        pickle.dump(obj, f)
+
+
 def dellPkl():
     with open("data.pkl", "rb") as f:
         obj = pickle.load(f)
         f.close()
-    del obj['nescau 2.0 radical 200g']
+    del obj['#']
     with open("data.pkl", "wb") as f:
         pickle.dump(obj, f)
+
+
+addBG()
+lerpkl()
 
 
 def testeMatch():
     a = input("Digit: ").isdigit()
     print(a)
-
-# editpkl()
-# lerpkl()
 
 
 def dictadd():
@@ -82,6 +96,3 @@ def dictadd():
 
 def versiona():
     print(pd.__version__)
-
-
-versiona()
