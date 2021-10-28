@@ -9,15 +9,12 @@ from reportlab.pdfgen import canvas
 class createPDF:
     def __init__(self, newOffer):
         self.date = datetime.today().strftime('%d-%m-%Y')
-        self.savepath = os.path.join(
-            newOffer['PDFsavepath'], datetime.today().strftime('%m-%Y'))
+        self.savepath = newOffer['PDFsavepath']
         self.products = newOffer['products']
         self.prices = newOffer['prices']
         self.background = newOffer['background']
 
     def initPDFfile(self):
-        # Cria o diretorio para salvar o PDF e cria o nome do arquivo
-        self.checkAndCreatesavepath()
 
         # Atribui nome e titulo ao arquivo PDF
         PDFname = self.setPDFname()
@@ -34,10 +31,6 @@ class createPDF:
 
         # Abre o arquivo automaticamente após criado
         os.startfile(self.savepath + '\\' + PDFname)
-
-    def checkAndCreatesavepath(self):
-        if not os.path.isdir(self.savepath):
-            os.makedirs(self.savepath)
 
     def setPDFname(self):
 
@@ -58,7 +51,13 @@ class createPDF:
         productAmmount = str(len(self.products))
 
         # desenha o background
-        pdf.drawInlineImage(self.background, 0, 0)
+        try:
+            pdf.drawInlineImage(self.background, 0, 0)
+        except:
+            print(
+                "ATENÇÃO: Não existem imagens de fundo cadastradas, o fundo fica em branco.\n")
+            os.system("pause")
+            os.system("cls")
 
         imgCoordinates = {
             "1": {

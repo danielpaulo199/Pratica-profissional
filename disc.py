@@ -69,18 +69,17 @@ def dellPkl():
     with open("data.pkl", "rb") as f:
         obj = pickle.load(f)
         f.close()
-    del obj['#']
+    del obj['#Green Background']
     with open("data.pkl", "wb") as f:
         pickle.dump(obj, f)
-
-
-addBG()
-lerpkl()
 
 
 def testeMatch():
     a = input("Digit: ").isdigit()
     print(a)
+
+
+lerpkl()
 
 
 def dictadd():
