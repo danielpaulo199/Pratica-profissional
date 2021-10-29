@@ -38,9 +38,9 @@ def lerpkl():
 
 def addToPkl():
     with open("data.pkl", "rb") as f:
-        obj = pickle.load(f)
+        data = pickle.load(f)
 
-    obj["nescau 2.0 radical 200g"] = {
+    data["nescau 2.0 radical 200g"] = {
         "name": "nescau 2.0 radical 200g",
         "img_path": "caminho do nescau",
         "disc1": "nescau 2.0",
@@ -49,7 +49,7 @@ def addToPkl():
     }
 
     with open("data.pkl", "wb") as f:
-        pickle.dump(obj, f)
+        pickle.dump(data, f)
 
 
 def addBG():

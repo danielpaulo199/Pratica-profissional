@@ -7,7 +7,6 @@ from tkinter import filedialog
 from shutil import copyfile
 from datetime import date, datetime
 
-# adicionar fundos
 # Bug = na hora de selecionar produtos no autocomplete se colocar letra crasha
 
 
@@ -36,12 +35,13 @@ class NiceDoDia:
             ------ NICE DO DIA ------
 
             1.Gerar Oferta
-            2.Alterar imagem de fundo
+            2.Selecionar imagem de fundo
             3.Adicionar novas imagens de fundo
             4.Adicionar produtos
             5.Editar produto
-            6.Sair
-            7.Paylod (testes)
+            6.Remover recursos
+            7.Sair
+            8.Paylod (testes)
             """)
             ans = input("Escolha uma opção: ")
             if ans == "1":
@@ -60,8 +60,12 @@ class NiceDoDia:
                 system('cls')
                 self.editProducts()
             elif ans == "6":
-                exit()
+                system('cls')
+                self.removeResources()
             elif ans == "7":
+                exit()
+            elif ans == "8":
+                system('cls')
                 self.payloadPDF()
             elif ans != "":
                 wait = input('\n Opção Invalida, tente novamente')
@@ -86,7 +90,7 @@ class NiceDoDia:
             product = str(input("Digite o {order} produto: ".format(
                 order=inputOrder[len(self.newOfferDict['products'])])))
 
-            validated_product = self.handleProductsInput(product)
+            validated_product = self.getAndlistProducts(product)
 
             if validated_product != None:
                 self.newOfferDict['products'].append(validated_product)
@@ -122,42 +126,6 @@ class NiceDoDia:
                 decimal = '00'
 
         self.newOfferDict['prices'].append(str(price+","+decimal))
-
-    def handleProductsInput(self, product):
-        with open(self.itensFile, "rb") as f:
-            try:
-                data = pickle.load(f)
-                f.close()
-            except:
-                print("Não existem produtos cadastrados!")
-                system("pause")
-                self.mainMenu()
-
-        matches = ["Cancelar"]
-        for find in data:
-            if product in find:
-                matches.append(find)
-
-        if len(matches) <= 1:
-            print("\n   Produto não encontrado!")
-            system("pause")
-            return
-
-        print('Selecione o Produto: "{0}"\n'.format(product))
-        for index, name in enumerate(matches):
-            print("{0}: {1}".format(index, name))
-        print("\n0: Cancelar\n")
-
-        while True:
-            option = int(input("Digite a opção: "))
-
-            if option >= 1 and option < len(matches):
-                return data[matches[option]]
-
-            if option == 0:
-                return
-
-            print("Opção invalida")
 
     def checkBackgroundImage(self):
 
@@ -207,7 +175,9 @@ class NiceDoDia:
         self.newOfferDict = {
             "products": [],
             "prices": [],
-            "PDFsavepath": self.PDFsavepath}
+            "PDFsavepath": self.PDFsavepath,
+            "background": self.background
+        }
 
         system("pause")
 
@@ -364,8 +334,9 @@ class NiceDoDia:
 
     def editProducts(self):
 
-        product = self.getAndlistProducts(
-            "Digite o produto que deseja editar: ")
+        product = input("Digite o produto que deseja editar: ")
+
+        product = self.getAndlistProducts(product)
 
         if product == None:
             return
@@ -489,21 +460,26 @@ class NiceDoDia:
 
         return product
 
-    def getAndlistProducts(self, inputLabel):
-
-        userInput = input(inputLabel)
+    def getAndlistProducts(self, product):
 
         with open(self.itensFile, "rb") as f:
             try:
                 data = pickle.load(f)
+                f.close()
+
+                # caso o arquivo esteja vazio volta ao menu
+                if len(data) == 0:
+                    print("Não existem produtos cadastrados!")
+                    system("pause")
+                    self.mainMenu()
             except:
                 print("Não existem produtos cadastrados!")
                 system("pause")
-                return
+                self.mainMenu()
 
         matches = ["Cancelar"]
         for find in data:
-            if userInput in find:
+            if product in find:
                 matches.append(find)
 
         if len(matches) <= 1:
@@ -511,22 +487,126 @@ class NiceDoDia:
             system("pause")
             return
 
-        print('Selecione o Produto: "{0}"\n'.format(userInput))
+        print('Selecione o Produto: "{0}"\n'.format(product))
         for index, name in enumerate(matches):
             print("{0}: {1}".format(index, name))
         print("\n0: Cancelar\n")
 
         while True:
-            option = int(input("Digite a opção: "))
+            try:
+                option = int(input("Digite a opção: "))
 
-            if option >= 1 and option < len(matches):
-                product = data[matches[option]]
-                return product
+                if option >= 1 and option < len(matches):
+                    return data[matches[option]]
 
-            if option == 0:
+                if option == 0:
+                    return
+
+                print("Opção invalida")
+
+            except:
+                print("Digite apenas números.")
+
+    def removeResources(self):
+        option = True
+        while option:
+            system('cls')
+            print("O que deseja remover?\n")
+            print("1 - produtos")
+            print("2 - Imagem de fundo\n")
+            print("0 - Cancelar\n")
+
+            option = input("Digite uma opção: ")
+
+            if option == '0':
                 return
 
-            print("Opção invalida")
+            elif option == '1':
+                self.removeProduct()
+
+            elif option == '2':
+                self.removeBackground()
+
+            elif option != '':
+                wait = input("Opção invalida, tente novamente: ")
+                system('cls')
+
+    def removeProduct(self):
+        system('cls')
+        product = input("Digite o produto que deseja REMOVER: ")
+
+        product = self.getAndlistProducts(product)
+
+        if product == None:
+            return
+
+        option = self.yesNoquestion(
+            f'\nDeseja mesmo excluir o produto: {product["name"]} ?')
+
+        if option == 'y':
+            removedProduct = product
+
+            # Deleta o registro do arquivo local
+            with open("data.pkl", "rb") as f:
+                data = pickle.load(f)
+
+            del data[removedProduct['name']]
+
+            with open("data.pkl", "wb") as f:
+                pickle.dump(data, f)
+                f.close()
+
+            # deleta a imagem do produto
+            remove(removedProduct['img_path'])
+
+            print(f'Produto excluido com sucesso: {removedProduct["name"]} ')
+            system("pause")
+
+        else:
+            print("Exclusão cancelada")
+            system("pause")
+
+    def removeBackground(self):
+        system('cls')
+
+        print("Imagens de fundo:\n")
+        # Recupera todas as imagens de fundo encontradas
+        backgrounds = listdir(self.BGsavepath)
+        backgrounds.insert(0, 'Cancelar....')
+
+        # caso não existam imagens de fundo volta ao menu
+        if len(backgrounds) <= 1:
+            print("Não existem imagens de fundo cadastradas\n")
+            system("pause")
+            return
+
+        # Lista para o usuario
+        print("Selecione a imagem de fundo que deseja REMOVER: \n")
+        for index, name in enumerate(backgrounds):
+            print("{0}: {1}".format(index, name[:-4]))
+        print("\n0: Cancelar\n")
+
+        while True:
+            try:
+                option = int(input("Digite a opção: "))
+
+                if option >= 1 and option < len(backgrounds):
+                    delOption = self.yesNoquestion(
+                        f'Deseja realmente REMOVER a imagem: {backgrounds[option]}')
+
+                    if delOption == 'y':
+                        remove(self.BGsavepath+'/'+backgrounds[option])
+                        print("Imagem removida com sucesso.")
+                        system("pause")
+                        return
+
+                if option == 0:
+                    return
+
+                print("Opção invalida")
+
+            except:
+                print("Digite apenas números.")
 
 
 if __name__ == "__main__":
