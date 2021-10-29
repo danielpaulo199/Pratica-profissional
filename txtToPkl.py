@@ -1,6 +1,7 @@
 from os import system
 import pickle
 import pprint
+from os import path
 
 imgsPath = './imgs/'
 extension = '.jpg'
@@ -26,10 +27,11 @@ for index in range(540):
         "disc2": lines[myi+2],
         "disc3": lines[myi+3],
     }
-    print(lines[myi])
+    if path.exists(imgsPath+lines[myi]+extension) == False:
+        print(f'Não existe: {imgsPath+lines[myi]+extension}')
     myi += 4
 
-# pprint.pprint(obj)
-with open("data.pkl", "wb") as f:
-    pickle.dump(obj, f)
-f.close()
+    # pprint.pprint(obj)
+    # with open("data.pkl", "wb") as f:
+    #    pickle.dump(obj, f)
+    # f.close()

@@ -512,7 +512,7 @@ class NiceDoDia:
         while option:
             system('cls')
             print("O que deseja remover?\n")
-            print("1 - produtos")
+            print("1 - Produtos")
             print("2 - Imagem de fundo\n")
             print("0 - Cancelar\n")
 

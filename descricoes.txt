@@ -194,7 +194,7 @@ creme de leite gloria 200g
 creme de leite
 glória
 200g
-creme de leite italac200g
+creme de leite italac 200g
 creme de leite
 italac
 200g
@@ -230,11 +230,11 @@ feijao preto pontarollo 1kg
 feijão preto
 pontarollo
 1kg
-guarana antarctica 1,5l
+refrigerante guarana antarctica 1,5l
 refrigerante guaraná
 antarctica
 1,5l
-guarana antarctica 269ml
+refrigerante  guarana antarctica 269ml
 refrigerante guaraná
 antarctica lata
 269ml
