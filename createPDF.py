@@ -100,7 +100,7 @@ class createPDF:
             pdf.line(290, 65, 290, 333)
 
             if len(self.products) == 4:
-                pdf.line(290, 340, 290, 591)
+                pdf.line(290, 330, 290, 591)
 
     def drawDescriptions(self, pdf):
         pdfmetrics.registerFont(TTFont('Algebrian Regular', 'ALGER.ttf'))
@@ -172,7 +172,7 @@ class createPDF:
                 "y": [360, 75, 75]
             },
             "4": {
-                "x": [255, 530, 250, 530],
+                "x": [250, 530, 250, 530],
                 "y": [340, 340, 75, 75]
             }
         }

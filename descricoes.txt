@@ -1,5 +1,5 @@
 leite aurora 1l
-leite integral 
+leite integral
 aurora
 1l
 achocolatado nescau 1,2kg
@@ -546,7 +546,6 @@ cerveja brahma zero 350ml
 cerveja brahma
 zero lata
 350ml
-CERVEJA EISENBAHN
 cerveja eisenbahn pale ale 355ml
 cerveja eisenbahn
 pale ale
@@ -1014,7 +1013,7 @@ atum ralado 88
 arroz parboilizado camil 5kg
 arroz parboilizado
 camil
- 5kg
+5kg
 arroz parboilizado camil 1kg
 arroz parboilizado
 camil 
@@ -1487,8 +1486,6 @@ refrigerante antarctica soda 2l
 refrigerante antarctica
 soda limonada
 2l
-biscoito isabela 400g
-biscoito isabela
 biscoito recheado mousse isabela 150g
 biscoito issabela
 mousse
@@ -2161,65 +2158,3 @@ filezinho sassami iqf copacol 800g
 filezinho sassami
 copacol iqf
 800g
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
