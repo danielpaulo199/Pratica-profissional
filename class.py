@@ -7,8 +7,6 @@ from tkinter import filedialog
 from shutil import copyfile
 from datetime import date, datetime
 
-# Bug = na hora de selecionar produtos no autocomplete se colocar letra crasha
-
 
 class NiceDoDia:
     def __init__(self):
