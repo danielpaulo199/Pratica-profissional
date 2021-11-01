@@ -41,7 +41,6 @@ class NiceDoDia:
             5.Editar produto
             6.Remover recursos
             7.Sair
-            8.Paylod (testes)
             """)
             ans = input("Escolha uma opção: ")
             if ans == "1":
@@ -64,9 +63,6 @@ class NiceDoDia:
                 self.removeResources()
             elif ans == "7":
                 exit()
-            elif ans == "8":
-                system('cls')
-                self.payloadPDF()
             elif ans != "":
                 wait = input('\n Opção Invalida, tente novamente')
                 system('cls')
@@ -90,23 +86,25 @@ class NiceDoDia:
             product = str(input("Digite o {order} produto: ".format(
                 order=inputOrder[len(self.newOfferDict['products'])])))
 
-            validated_product = self.getAndlistProducts(product)
+            validated_product = self.listProducts(product)
 
             if validated_product != None:
                 self.newOfferDict['products'].append(validated_product)
-                self.getAndHandlePrices()
+                self.getPrices()
 
-    def getAndHandlePrices(self):
+    def getPrices(self):
         array_possition = int(len(self.newOfferDict['products']) - 1)
         while 1:
             print("Digite o preço para: ",
                   self.newOfferDict['products'][array_possition]["name"])
             price = input().strip()
             if len(price) < 7 and re.match(r'^[0-9,]+$', price):
+                self.HandlePrices(price)
                 break
             print('Preço não pode conter: ', re.findall(r'[^0-9,]', price))
             print('Tente novamente: ')
 
+    def HandlePrices(self, price):
         if len(price) > 3 and price.find(',') == -1:
             price = price[:3]
             decimal = '00'
@@ -155,14 +153,6 @@ class NiceDoDia:
         self.checkBackgroundImage()
         # Método para instanciar e criar novo PDF
         self.createPDFfile()
-
-    def payloadPDF(self):
-
-        self.newOfferDict = {'products': [{'name': 'abacaxi tropical unidade', 'img_path': './imgs/abacaxi tropical und.jpg', 'disc1': 'abacaxi tropical',
-                                           'disc2': 'gostozo d+', 'disc3': 'und'}], 'prices': ['222,00'], 'PDFsavepath': './PDFs/', 'background': './fundos/Default.jpg'}
-
-        PDFfile = createPDF(self.newOfferDict)
-        PDFfile.initPDFfile()
 
     def createPDFfile(self):
 
@@ -285,24 +275,17 @@ class NiceDoDia:
                 "Digite a "+displatText[index]+" linha da descrição:")
             descriptions.append(description)
 
-        # Salva os registros no arquivo local
-        with open("data.pkl", "rb+") as f:
-            try:
-                data = pickle.load(f)
-            except:
-                data = {}
+        # cria o objeto para salvar no arquivo
+        obj = {}
+        obj[name] = {
+            "name": name,
+            "img_path": savepath,
+            "disc1": descriptions[0],
+            "disc2": descriptions[1],
+            "disc3": descriptions[2]
+        }
 
-            data[name] = {
-                "name": name,
-                "img_path": savepath,
-                "disc1": descriptions[0],
-                "disc2": descriptions[1],
-                "disc3": descriptions[2]
-            }
-
-        with open("data.pkl", "wb") as f:
-            pickle.dump(data, f)
-            f.close()
+        self.writeToFile(obj)
 
         # Copia nova imagem para a pasta local
         copyfile(selectedFile, savepath)
@@ -336,7 +319,7 @@ class NiceDoDia:
 
         product = input("Digite o produto que deseja editar: ")
 
-        product = self.getAndlistProducts(product)
+        product = self.listProducts(product)
 
         if product == None:
             return
@@ -358,12 +341,11 @@ class NiceDoDia:
             product = self.handleDescriptionsEdit(product)
 
         # Ápos feita a edição deleta o objeto antigo e salva o novo
-        with open("data.pkl", "rb") as f:
-            data = pickle.load(f)
+        self.deleteFromFile(oldName)
 
-        del data[oldName]
-
-        data[product['name']] = {
+        # cria o novo a ser salvo
+        obj = {}
+        obj[product['name']] = {
             "name": product['name'],
             "img_path": product['img_path'],
             "disc1": product['disc1'],
@@ -371,9 +353,8 @@ class NiceDoDia:
             "disc3": product['disc3']
         }
 
-        with open("data.pkl", "wb") as f:
-            pickle.dump(data, f)
-            f.close()
+        # salve no arquivo
+        self.writeToFile(obj)
 
         print("Produto editado com sucesso!")
         system("pause")
@@ -460,22 +441,20 @@ class NiceDoDia:
 
         return product
 
-    def getAndlistProducts(self, product):
+    def listProducts(self, product):
 
-        with open(self.itensFile, "rb") as f:
-            try:
-                data = pickle.load(f)
-                f.close()
+        try:
+            data = self.readFromFile()
 
-                # caso o arquivo esteja vazio volta ao menu
-                if len(data) == 0:
-                    print("Não existem produtos cadastrados!")
-                    system("pause")
-                    self.mainMenu()
-            except:
+            # caso o arquivo esteja vazio volta ao menu
+            if len(data) == 0:
                 print("Não existem produtos cadastrados!")
                 system("pause")
                 self.mainMenu()
+        except:
+            print("Não existem produtos cadastrados!")
+            system("pause")
+            self.mainMenu()
 
         matches = ["Cancelar"]
         for find in data:
@@ -535,7 +514,7 @@ class NiceDoDia:
         system('cls')
         product = input("Digite o produto que deseja REMOVER: ")
 
-        product = self.getAndlistProducts(product)
+        product = self.listProducts(product)
 
         if product == None:
             return
@@ -547,14 +526,7 @@ class NiceDoDia:
             removedProduct = product
 
             # Deleta o registro do arquivo local
-            with open("data.pkl", "rb") as f:
-                data = pickle.load(f)
-
-            del data[removedProduct['name']]
-
-            with open("data.pkl", "wb") as f:
-                pickle.dump(data, f)
-                f.close()
+            self.deleteFromFile(removedProduct['name'])
 
             # deleta a imagem do produto
             remove(removedProduct['img_path'])
@@ -607,6 +579,37 @@ class NiceDoDia:
 
             except:
                 print("Digite apenas números.")
+
+    def writeToFile(self, obj):
+
+        # Salva os registros no arquivo local
+        with open("data.pkl", "rb") as f:
+            try:
+                data = pickle.load(f)
+            except:
+                data = {}
+
+        data.update(obj)
+
+        with open("data.pkl", "wb") as f:
+            pickle.dump(data, f)
+            f.close()
+
+    def deleteFromFile(self, iten):
+        with open("data.pkl", "rb") as f:
+            data = pickle.load(f)
+
+            del data[iten]
+
+        with open("data.pkl", "wb") as f:
+            pickle.dump(data, f)
+            f.close()
+
+    def readFromFile(self):
+        with open("data.pkl", "rb") as f:
+            data = pickle.load(f)
+
+            return data
 
 
 if __name__ == "__main__":
