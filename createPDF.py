@@ -8,17 +8,17 @@ from reportlab.pdfgen import canvas
 
 class createPDF:
     def __init__(self, newOffer):
-        self.date = datetime.today().strftime('%d-%m-%Y')
-        self.savepath = newOffer['PDFsavepath']
-        self.products = newOffer['products']
-        self.prices = newOffer['prices']
-        self.background = newOffer['background']
+        self.date = datetime.today().strftime("%d-%m-%Y")
+        self.savepath = newOffer["PDFsavepath"]
+        self.products = newOffer["products"]
+        self.prices = newOffer["prices"]
+        self.background = newOffer["background"]
 
     def initPDFfile(self):
 
         # Atribui nome e titulo ao arquivo PDF
         PDFname = self.setPDFname()
-        pdf = canvas.Canvas(self.savepath + '/' + PDFname)
+        pdf = canvas.Canvas(self.savepath + "/" + PDFname)
         pdf.setTitle(PDFname)
 
         # Desenhas os objetos no PDF
@@ -30,7 +30,7 @@ class createPDF:
         pdf.save()
 
         # Abre o arquivo automaticamente após criado
-        os.startfile(self.savepath + '\\' + PDFname)
+        os.startfile(self.savepath + "\\" + PDFname)
 
     def setPDFname(self):
 
@@ -42,9 +42,11 @@ class createPDF:
                 copies.append(file)
 
         if len(copies) == 0:
-            return str('Boa do Dia '+self.date+'.pdf')
+            return str("Boa do Dia " + self.date + ".pdf")
         else:
-            return str('Boa do Dia '+self.date+' ('+str(len(copies))+')'+'.pdf')
+            return str(
+                "Boa do Dia " + self.date + " (" + str(len(copies)) + ")" + ".pdf"
+            )
 
     def drawProductsImages(self, pdf):
         # variavel para controlar o array
@@ -55,41 +57,29 @@ class createPDF:
             pdf.drawInlineImage(self.background, 0, 0)
         except:
             print(
-                "ATENÇÃO: Não existem imagens de fundo cadastradas, o fundo fica em branco.\n")
+                "ATENÇÃO: Não existem imagens de fundo cadastradas, o fundo fica em branco.\n"
+            )
             os.system("pause")
             os.system("cls")
 
         imgCoordinates = {
-            "1": {
-                "x": [100],
-                "y": [300],
-                "width": 388,
-                "height": 272
-            },
-            "2": {
-                "x": [50, 300],
-                "y": [380, 125]
-            },
-            "3": {
-                "x": [50, 35, 315],
-                "y": [380, 160, 160]
-            },
-            "4": {
-                "x": [35, 315, 35, 315],
-                "y": [415, 415, 160, 160]
-            }
+            "1": {"x": [100], "y": [300], "width": 388, "height": 272},
+            "2": {"x": [50, 300], "y": [380, 125]},
+            "3": {"x": [50, 35, 315], "y": [380, 160, 160]},
+            "4": {"x": [35, 315, 35, 315], "y": [415, 415, 160, 160]},
         }
 
         for index in range(0, len(self.products)):
-            pdf.drawImage(self.products[index]['img_path'],
-                          imgCoordinates[productAmmount]['x'][index],
-                          imgCoordinates[productAmmount]['y'][index],
-                          width=imgCoordinates.get(
-                              productAmmount, {}).get('width', 238),
-                          height=imgCoordinates.get(productAmmount, {}).get('height', 167))
+            pdf.drawImage(
+                self.products[index]["img_path"],
+                imgCoordinates[productAmmount]["x"][index],
+                imgCoordinates[productAmmount]["y"][index],
+                width=imgCoordinates.get(productAmmount, {}).get("width", 238),
+                height=imgCoordinates.get(productAmmount, {}).get("height", 167),
+            )
 
     def drawCenterLines(self, pdf):
-       # Desenha as linhas para separar os produtos
+        # Desenha as linhas para separar os produtos
         pdf.setStrokeColorRGB(0.91796875, 0.421875, 0.08203125)  # laranja
 
         if len(self.products) == 2:
@@ -103,33 +93,26 @@ class createPDF:
                 pdf.line(290, 330, 290, 591)
 
     def drawDescriptions(self, pdf):
-        pdfmetrics.registerFont(TTFont('Algebrian Regular', 'ALGER.ttf'))
-        pdf.setFont("Algebrian Regular", 25)
+        try:
+            pdfmetrics.registerFont(TTFont("Algebrian Regular", "ALGER.ttf"))
+            pdf.setFont("Algebrian Regular", 20)
+        except:
+            pdfmetrics.registerFont(TTFont("Calibri", "calibrib.ttf"))
+            pdf.setFont("Calibri", 20)
+
         pdf.setFillColorRGB(0, 0.4375, 0.75)  # Azul claro
 
-        productAmmount = (str(len(self.products)))
+        productAmmount = str(len(self.products))
 
         descCoordinates = {  # Coordenadas das descrições
-            "1": {
-                "x": [65],
-                "y": [240],
-                "lineHeight": [0, 35, 70]
-            },
-            "2": {
-                "x": [300, 35],
-                "y": [530, 270],
-                "lineHeight": [0, 24, 48]
-            },
-            "3": {
-                "x": [300, 35, 300],
-                "y": [530, 140, 140],
-                "lineHeight": [0, 24, 48]
-            },
+            "1": {"x": [65], "y": [240], "lineHeight": [0, 35, 70]},
+            "2": {"x": [300, 35], "y": [530, 270], "lineHeight": [0, 24, 48]},
+            "3": {"x": [300, 35, 300], "y": [530, 140, 140], "lineHeight": [0, 24, 48]},
             "4": {
                 "x": [35, 300, 35, 300],
                 "y": [395, 395, 140, 140],
-                "lineHeight": [0, 24, 48]
-            }
+                "lineHeight": [0, 24, 48],
+            },
         }
 
         if len(self.products) == 1:
@@ -139,18 +122,16 @@ class createPDF:
         for index in range(0, len(self.products)):
             # Desenha as 3 linhas de descrição
             for line in range(0, 3):
-                # Caso a linha da descrição seja maior de 18 caracteres diminui a fonte
-                if len(self.products[index]['disc'+str(line+1)]) > 18:
-                    pdf.setFontSize(20)
 
                 # Draw Strings de descrição
-                pdf.drawString(descCoordinates[productAmmount]['x'][index],
-                               descCoordinates[productAmmount]['y'][index] -
-                               descCoordinates[productAmmount]['lineHeight'][line],
-                               self.products[index]['disc'+str(line+1)])
+                pdf.drawString(
+                    descCoordinates[productAmmount]["x"][index],
+                    descCoordinates[productAmmount]["y"][index]
+                    - descCoordinates[productAmmount]["lineHeight"][line],
+                    self.products[index]["disc" + str(line + 1)],
+                )
 
     def drawPrices(self, pdf):
-        pdfmetrics.registerFont(TTFont('Calibri', 'calibrib.ttf'))
         pdf.setFillColorRGB(0.91796875, 0.421875, 0.08203125)  # Laranja
         pdf.setFont("Calibri", 20)
 
@@ -159,49 +140,37 @@ class createPDF:
 
         # coordenadas base onde iniciara os decimais
         priceCoordinates = {
-            "1": {
-                "x": [470],
-                "y": [120]
-            },
-            "2": {
-                "x": [470, 210],
-                "y": [360, 100]
-            },
-            "3": {
-                "x": [470, 250, 530],
-                "y": [360, 75, 75]
-            },
-            "4": {
-                "x": [250, 530, 250, 530],
-                "y": [340, 340, 75, 75]
-            }
+            "1": {"x": [470], "y": [120]},
+            "2": {"x": [470, 210], "y": [360, 100]},
+            "3": {"x": [470, 250, 530], "y": [360, 75, 75]},
+            "4": {"x": [250, 530, 250, 530], "y": [340, 340, 75, 75]},
         }
 
         # String fixa para desenha o R$
-        dolarSignString = 'R$'
+        dolarSignString = "R$"
         dolarSignFont = 20
 
         for index in range(0, len(self.products)):
 
             # define as strings a serem desenhadas
-            numeralString = self.prices[index].split(',')[0]
-            decimalString = "," + self.prices[index].split(',')[1]
+            numeralString = self.prices[index].split(",")[0]
+            decimalString = "," + self.prices[index].split(",")[1]
 
             # Define o tanho da fonte para as string
-            numeralFont, decimalFont = self.getPriceFontSize(
-                numeralString, index)
+            numeralFont, decimalFont = self.getPriceFontSize(numeralString, index)
 
             # Define as coordenadas base
-            x = priceCoordinates[productAmmount]['x'][index]
-            y = priceCoordinates[productAmmount]['y'][index]
+            x = priceCoordinates[productAmmount]["x"][index]
+            y = priceCoordinates[productAmmount]["y"][index]
 
             # Desenha os decimais
             pdf.setFontSize(decimalFont)
             pdf.drawString(x, y, decimalString)
 
             # Calcula a proxima coordenada com base no tamanho da passada
-            nextCoordinate = x - int(pdfmetrics.stringWidth(
-                numeralString, 'Calibri', numeralFont))
+            nextCoordinate = x - int(
+                pdfmetrics.stringWidth(numeralString, "Calibri", numeralFont)
+            )
 
             # Desenha o Numeral
             pdf.setFontSize(numeralFont)
@@ -209,7 +178,8 @@ class createPDF:
 
             # Calcula a proxima coordenada com base no tamanho da passada
             nextCoordinate -= pdfmetrics.stringWidth(
-                dolarSignString, 'Calibri', dolarSignFont)
+                dolarSignString, "Calibri", dolarSignFont
+            )
 
             # Desenha o R$
             pdf.setFontSize(dolarSignFont)

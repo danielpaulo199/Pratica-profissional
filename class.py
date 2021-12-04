@@ -12,24 +12,24 @@ class NiceDoDia:
     def __init__(self):
         self.itensFile = "data.pkl"
         self.productAmmount = 0
-        self.imgSavepath = './imgs'
-        self.PDFsavepath = path.join(
-            './PDFs/' + datetime.today().strftime('%m-%Y'))
-        self.BGsavepath = './fundos'
-        self.background = ''
+        self.imgSavepath = "./imgs"
+        self.PDFsavepath = path.join("./PDFs/" + datetime.today().strftime("%m-%Y"))
+        self.BGsavepath = "./fundos"
+        self.background = ""
         # Dict que vai conter as variaveis para gerar o pdf
         self.newOfferDict = {
             "products": [],
             "prices": [],
             "PDFsavepath": self.PDFsavepath,
-            "background": self.background
+            "background": self.background,
         }
 
     def mainMenu(self):
         ans = True
         while ans:
             system("cls")
-            print("""
+            print(
+                """
             ------ NICE DO DIA ------
 
             1.Gerar Oferta
@@ -39,109 +39,119 @@ class NiceDoDia:
             5.Editar produto
             6.Remover recursos
             7.Sair
-            """)
+            """
+            )
             ans = input("Escolha uma opção: ")
             if ans == "1":
-                system('cls')
+                system("cls")
                 self.createOffer()
             elif ans == "2":
-                system('cls')
+                system("cls")
                 self.selectBackground()
             elif ans == "3":
-                system('cls')
+                system("cls")
                 self.addBackgrouds()
             elif ans == "4":
-                system('cls')
+                system("cls")
                 self.addProducts()
             elif ans == "5":
-                system('cls')
+                system("cls")
                 self.editProducts()
             elif ans == "6":
-                system('cls')
+                system("cls")
                 self.removeResources()
             elif ans == "7":
                 exit()
             elif ans != "":
-                wait = input('\n Opção Invalida, tente novamente')
-                system('cls')
+                wait = input("\n Opção Invalida, tente novamente")
+                system("cls")
 
     def getProductAmmountInput(self):
         while 1:
             self.productAmmount = input(
-                "Digite a quantidade de itens (Máximo 4): ").strip()
-            if re.match(r'^[1-4]+$', self.productAmmount):
+                "Digite a quantidade de itens (Máximo 4): "
+            ).strip()
+            if re.match(r"^[1-4]+$", self.productAmmount):
                 if int(self.productAmmount) <= 4 and int(self.productAmmount) > 0:
                     break
-            print('Quantidade não pode conter: ',
-                  re.findall(r'[^1-4]', self.productAmmount))
-            print('Tente novamente: ')
+            print(
+                "Quantidade não pode conter: ",
+                re.findall(r"[^1-4]", self.productAmmount),
+            )
+            print("Tente novamente: ")
 
     def getProductsInput(self):
-        inputOrder = ['primeiro', 'segundo', 'terceiro', 'quarto']
+        inputOrder = ["primeiro", "segundo", "terceiro", "quarto"]
 
-        while len(self.newOfferDict['products']) < int(self.productAmmount):
+        while len(self.newOfferDict["products"]) < int(self.productAmmount):
             system("cls")
-            product = str(input("Digite o {order} produto: ".format(
-                order=inputOrder[len(self.newOfferDict['products'])])))
+            product = str(
+                input(
+                    "Digite o {order} produto: ".format(
+                        order=inputOrder[len(self.newOfferDict["products"])]
+                    )
+                )
+            )
 
             validated_product = self.listProducts(product)
 
             if validated_product != None:
-                self.newOfferDict['products'].append(validated_product)
+                self.newOfferDict["products"].append(validated_product)
                 self.getPrices()
 
     def getPrices(self):
-        array_possition = int(len(self.newOfferDict['products']) - 1)
+        array_possition = int(len(self.newOfferDict["products"]) - 1)
         while 1:
-            print("Digite o preço para: ",
-                  self.newOfferDict['products'][array_possition]["name"])
+            print(
+                "Digite o preço para: ",
+                self.newOfferDict["products"][array_possition]["name"],
+            )
             price = input().strip()
-            if len(price) < 7 and re.match(r'^[0-9,]+$', price):
+            if len(price) < 7 and re.match(r"^[0-9,]+$", price):
                 self.HandlePrices(price)
                 break
-            print('Preço não pode conter: ', re.findall(r'[^0-9,]', price))
-            print('Tente novamente: ')
+            print("Preço não pode conter: ", re.findall(r"[^0-9,]", price))
+            print("Tente novamente: ")
 
     def HandlePrices(self, price):
-        if len(price) > 3 and price.find(',') == -1:
+        if len(price) > 3 and price.find(",") == -1:
             price = price[:3]
-            decimal = '00'
+            decimal = "00"
 
-        if len(price) <= 3 and price.find(',') == -1:
-            decimal = '00'
+        if len(price) <= 3 and price.find(",") == -1:
+            decimal = "00"
 
-        if price.find(',') != -1:
-            separa = price.split(',')
+        if price.find(",") != -1:
+            separa = price.split(",")
             price = separa[0][:3]
 
             if len(separa[1]) >= 2:
                 decimal = separa[1][:2]
             if len(separa[1]) == 1:
-                decimal = separa[1] + '0'
+                decimal = separa[1] + "0"
             if len(separa[1]) == 0:
-                decimal = '00'
+                decimal = "00"
 
-        self.newOfferDict['prices'].append(str(price+","+decimal))
+        self.newOfferDict["prices"].append(str(price + "," + decimal))
 
     def checkBackgroundImage(self):
 
         # Caso a imagen de fundo selecionado exista retorna
-        if path.exists(self.newOfferDict['background']):
+        if path.exists(self.newOfferDict["background"]):
             return
 
         # caso a imagem selecionada não existe coloca uma padrão
-        default = self.BGsavepath+'/Default.jpg'
+        default = self.BGsavepath + "/Default.jpg"
         # Seta o background para padrão
         if path.exists(default):
-            self.newOfferDict['background'] = default
+            self.newOfferDict["background"] = default
         else:  # caso não encontre o default
             backgrounds = listdir(self.BGsavepath)
 
             if len(backgrounds) == 0:
                 return
             # usa o primeiro que encontar no diretorio
-            self.newOfferDict['background'] = self.BGsavepath + \
-                '/'+backgrounds[0]
+            self.newOfferDict["background"] = self.BGsavepath + "/" + backgrounds[0]
 
     def createOffer(self):
         # Chama os métodos para receber os inputs
@@ -164,7 +174,7 @@ class NiceDoDia:
             "products": [],
             "prices": [],
             "PDFsavepath": self.PDFsavepath,
-            "background": self.background
+            "background": self.background,
         }
 
         system("pause")
@@ -186,7 +196,7 @@ class NiceDoDia:
         self.checkAndCreateFolders()
 
         # Copia a imagem selecionada para a pasta de fundos
-        savepath = self.BGsavepath+'/'+name+extension
+        savepath = self.BGsavepath + "/" + name + extension
         copyfile(selectedFile, savepath)
         print("\nImagem de fundo adicionada com sucesso!\n")
         system("pause")
@@ -196,7 +206,7 @@ class NiceDoDia:
         print("Imagens de fundo:\n")
         # Recupera todas as imagens de fundo encontradas
         backgrounds = listdir(self.BGsavepath)
-        backgrounds.insert(0, 'Cancelar....')
+        backgrounds.insert(0, "Cancelar....")
 
         # caso não existam imagens de fundo volta ao menu
         if len(backgrounds) <= 1:
@@ -215,8 +225,9 @@ class NiceDoDia:
 
             if option >= 1 and option < len(backgrounds):
                 selectedBg = backgrounds[option]
-                self.newOfferDict['background'] = self.BGsavepath + \
-                    '/'+backgrounds[option]
+                self.newOfferDict["background"] = (
+                    self.BGsavepath + "/" + backgrounds[option]
+                )
                 break
 
             if option == 0:
@@ -225,7 +236,7 @@ class NiceDoDia:
             print("Opção invalida!")
 
         print("\n Imagem de fundo definida com sucesso! \n")
-        system('pause')
+        system("pause")
 
     def checkAndCreateFolders(self):
         # cria o arquivo local para salvar os itens caso nao exista
@@ -236,18 +247,15 @@ class NiceDoDia:
         # Cria e da permisão para os dirétorio locais caso não existam
         if not path.isdir(self.BGsavepath):
             makedirs(self.BGsavepath)
-            chmod(self.BGsavepath, stat.S_IWRITE)
 
         if not path.isdir(self.imgSavepath):
             makedirs(self.imgSavepath)
-            chmod(self.imgSavepath, stat.S_IWRITE)
 
         if not path.isdir(self.PDFsavepath):
             makedirs(self.PDFsavepath)
-            chmod(self.PDFsavepath, stat.S_IWRITE)
 
     def addProducts(self):
-        displatText = ['primeira', 'segunda', 'terceira']
+        displatText = ["primeira", "segunda", "terceira"]
 
         # seleciona a imagem
         selectedFile, extension = self.selectFiles()
@@ -262,15 +270,16 @@ class NiceDoDia:
         name = self.handleFileName("Digite o nome completo do novo produto: ")
 
         # caminho da nova imagem
-        savepath = self.imgSavepath+'/'+name+extension
+        savepath = self.imgSavepath + "/" + name + extension
 
         # loop para inserir as linhas de descrição dos produtos
-        system('cls')
+        system("cls")
         print("OS PRODUTOS DEVEM TER 3 LINHAS DE DESCRIÇÃO.\n")
         descriptions = []
         for index in range(3):
             description = input(
-                "Digite a "+displatText[index]+" linha da descrição:")
+                "Digite a " + displatText[index] + " linha da descrição:"
+            )
             descriptions.append(description)
 
         # cria o objeto para salvar no arquivo
@@ -280,7 +289,7 @@ class NiceDoDia:
             "img_path": savepath,
             "disc1": descriptions[0],
             "disc2": descriptions[1],
-            "disc3": descriptions[2]
+            "disc3": descriptions[2],
         }
 
         self.writeToFile(obj)
@@ -288,7 +297,7 @@ class NiceDoDia:
         # Copia nova imagem para a pasta local
         copyfile(selectedFile, savepath)
 
-        system('cls')
+        system("cls")
         print('Produto "{0}" adicionado com sucesso!'.format(name))
         system("pause")
 
@@ -297,13 +306,16 @@ class NiceDoDia:
         root = tk.Tk()
         # Faz a janela fica quase invisivel ao usuario para apenas mostrar o explorer
         root.overrideredirect(True)
-        root.geometry('0x0+0+0')
+        root.geometry("0x0+0+0")
 
         print("Selecione uma imagem...")
         root.focus_force()
 
         selectedFile = filedialog.askopenfilename(
-            initialdir="/", title="Selecione uma imagem", filetypes=(("jpeg files", "*.jpg"), ("png files", "*.png")))
+            initialdir="/",
+            title="Selecione uma imagem",
+            filetypes=(("jpeg files", "*.jpg"), ("png files", "*.png")),
+        )
 
         # pega a extensão do arquivo selecionado
         extension = selectedFile[-4:]
@@ -323,19 +335,18 @@ class NiceDoDia:
             return
 
         # nome antigo
-        oldName = product['name']
+        oldName = product["name"]
 
         editName = self.yesNoquestion("Deseja editar o nome do produto? ")
-        if editName == 'y':
+        if editName == "y":
             product = self.handleNameEdit(product)
 
         editImage = self.yesNoquestion("Deseja editar a imagem do produto? ")
-        if editImage == 'y':
+        if editImage == "y":
             product = self.handleImageEdit(product)
 
-        editDescription = self.yesNoquestion(
-            "Deseja editar a descrição do produto? ")
-        if editDescription == 'y':
+        editDescription = self.yesNoquestion("Deseja editar a descrição do produto? ")
+        if editDescription == "y":
             product = self.handleDescriptionsEdit(product)
 
         # Ápos feita a edição deleta o objeto antigo e salva o novo
@@ -343,12 +354,12 @@ class NiceDoDia:
 
         # cria o novo a ser salvo
         obj = {}
-        obj[product['name']] = {
-            "name": product['name'],
-            "img_path": product['img_path'],
-            "disc1": product['disc1'],
-            "disc2": product['disc2'],
-            "disc3": product['disc3']
+        obj[product["name"]] = {
+            "name": product["name"],
+            "img_path": product["img_path"],
+            "disc1": product["disc1"],
+            "disc2": product["disc2"],
+            "disc3": product["disc3"],
         }
 
         # salve no arquivo
@@ -359,14 +370,14 @@ class NiceDoDia:
 
     def yesNoquestion(self, question):
         while True:
-            system('cls')
-            option = input(question+" (Y/n):")
-            if option == 'Y' or option == 'y':
-                system('cls')
-                return 'y'
-            elif option == 'n' or option == 'N':
-                system('cls')
-                return 'n'
+            system("cls")
+            option = input(question + " (Y/n):")
+            if option == "Y" or option == "y":
+                system("cls")
+                return "y"
+            elif option == "n" or option == "N":
+                system("cls")
+                return "n"
 
     def handleImageEdit(self, product):
         # seleciona a nova imagem
@@ -378,20 +389,20 @@ class NiceDoDia:
             return
 
         # pega o nome da imagem selecionada
-        name = product['name']
+        name = product["name"]
 
         # caminho da nova imagem
-        savepath = self.imgSavepath+'/'+name+extension
+        savepath = self.imgSavepath + "/" + name + extension
 
         try:
-            remove(product['img_path'])
+            remove(product["img_path"])
         except:
             pass
 
         copyfile(selectedFile, savepath)
 
         # update no objeto
-        product['img_path'] = savepath
+        product["img_path"] = savepath
 
         print("Imagem editada com sucesso!\n")
         system("pause")
@@ -402,19 +413,22 @@ class NiceDoDia:
         # Aplica o nome do arquivo com o padrão de nome do windowns
         while 1:
             name = input(inputLabel).strip()
-            if len(name) >= 1 and re.match(r'^[ A-Za-z0-9_-]*$', name):
+            if len(name) >= 1 and re.match(r"^[ A-Za-z0-9_-]*$", name):
                 break
-            print('Nome do arquivo não pode conter: ',
-                  re.findall(r'[^ A-Za-z0-9_-]', name))
-            print('\nTente novamente: ')
+            print(
+                "Nome do arquivo não pode conter: ",
+                re.findall(r"[^ A-Za-z0-9_-]", name),
+            )
+            print("\nTente novamente: ")
 
         return name
 
     def handleNameEdit(self, product):
         name = self.handleFileName(
-            'Digite o novo nome para o produto "{0}":\n'.format(product['name']))
+            'Digite o novo nome para o produto "{0}":\n'.format(product["name"])
+        )
 
-        product['name'] = name
+        product["name"] = name
 
         print("Nome do arquivo editado com sucesso!")
         system("pause")
@@ -422,16 +436,17 @@ class NiceDoDia:
         return product
 
     def handleDescriptionsEdit(self, product):
-        displatText = ['primeira', 'segunda', 'terceira']
-        disc = ['disc1', 'disc2', 'disc3']
+        displatText = ["primeira", "segunda", "terceira"]
+        disc = ["disc1", "disc2", "disc3"]
 
         # loop para inserir as linhas de descrição dos produtos
-        system('cls')
+        system("cls")
         print("OS PRODUTOS DEVEM TER 3 LINHAS DE DESCRIÇÃO.\n")
         descriptions = []
         for index in range(3):
             description = input(
-                "Digite a "+displatText[index]+" linha da descrição:")
+                "Digite a " + displatText[index] + " linha da descrição:"
+            )
             descriptions.append(description)
 
         for index in range(3):
@@ -487,7 +502,7 @@ class NiceDoDia:
     def removeResources(self):
         option = True
         while option:
-            system('cls')
+            system("cls")
             print("O que deseja remover?\n")
             print("1 - Produtos")
             print("2 - Imagem de fundo\n")
@@ -495,21 +510,21 @@ class NiceDoDia:
 
             option = input("Digite uma opção: ")
 
-            if option == '0':
+            if option == "0":
                 return
 
-            elif option == '1':
+            elif option == "1":
                 self.removeProduct()
 
-            elif option == '2':
+            elif option == "2":
                 self.removeBackground()
 
-            elif option != '':
+            elif option != "":
                 wait = input("Opção invalida, tente novamente: ")
-                system('cls')
+                system("cls")
 
     def removeProduct(self):
-        system('cls')
+        system("cls")
         product = input("Digite o produto que deseja REMOVER: ")
 
         product = self.listProducts(product)
@@ -518,16 +533,17 @@ class NiceDoDia:
             return
 
         option = self.yesNoquestion(
-            f'\nDeseja mesmo excluir o produto: {product["name"]} ?')
+            f'\nDeseja mesmo excluir o produto: {product["name"]} ?'
+        )
 
-        if option == 'y':
+        if option == "y":
             removedProduct = product
 
             # Deleta o registro do arquivo local
-            self.deleteFromFile(removedProduct['name'])
+            self.deleteFromFile(removedProduct["name"])
 
             # deleta a imagem do produto
-            remove(removedProduct['img_path'])
+            remove(removedProduct["img_path"])
 
             print(f'Produto excluido com sucesso: {removedProduct["name"]} ')
             system("pause")
@@ -537,12 +553,12 @@ class NiceDoDia:
             system("pause")
 
     def removeBackground(self):
-        system('cls')
+        system("cls")
 
         print("Imagens de fundo:\n")
         # Recupera todas as imagens de fundo encontradas
         backgrounds = listdir(self.BGsavepath)
-        backgrounds.insert(0, 'Cancelar....')
+        backgrounds.insert(0, "Cancelar....")
 
         # caso não existam imagens de fundo volta ao menu
         if len(backgrounds) <= 1:
@@ -562,10 +578,11 @@ class NiceDoDia:
 
                 if option >= 1 and option < len(backgrounds):
                     delOption = self.yesNoquestion(
-                        f'Deseja realmente REMOVER a imagem: {backgrounds[option]}')
+                        f"Deseja realmente REMOVER a imagem: {backgrounds[option]}"
+                    )
 
-                    if delOption == 'y':
-                        remove(self.BGsavepath+'/'+backgrounds[option])
+                    if delOption == "y":
+                        remove(self.BGsavepath + "/" + backgrounds[option])
                         print("Imagem removida com sucesso.")
                         system("pause")
                         return
