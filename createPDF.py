@@ -132,6 +132,7 @@ class createPDF:
                 )
 
     def drawPrices(self, pdf):
+        pdfmetrics.registerFont(TTFont("Calibri", "calibrib.ttf"))
         pdf.setFillColorRGB(0.91796875, 0.421875, 0.08203125)  # Laranja
         pdf.setFont("Calibri", 20)
 
